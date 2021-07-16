@@ -6,8 +6,8 @@
 \usage{
 term_freqs(
   x,
-  as = c("entity", "quality", "phenotype"),
-  corpus = c("taxon_annotations", "taxa", "gene_annotations", "genes"),
+  as = c("phenotype", "entity", "quality"),
+  corpus = c("taxa", "taxon_annotations", "gene_annotations", "genes"),
   decodeIRI = FALSE,
   ...
 )
@@ -19,7 +19,7 @@ objects.}
 \item{as}{the category or categories of the input terms (see \code{\link[=term_category]{term_category()}}).
 Supported categories are "entity", "quality", and "phenotype". The value
 must either be a single category (applying to all terms), or a vector of
-categories (of same length as \code{x}). The default is "entity".}
+categories (of same length as \code{x}). The default is ""phenotype"".}
 
 \item{corpus}{the name of the corpus for which to determine frequencies.
 Supported values are "taxon_annotations", "taxa", "gene_annotations", and
@@ -71,10 +71,9 @@ determine (and possibly correct) categories beforehand using \code{\link[=term_c
 \examples{
 terms <- c("pectoral fin", "pelvic fin", "dorsal fin", "paired fin")
 IRIs <- sapply(terms, get_term_iri, as = "anatomy")
-term_freqs(IRIs, as = "entity")
+term_freqs(IRIs, as = "phenotype")
 
 phens <- get_phenotypes(entity = "basihyal bone")
-term_freqs(phens$id, as = "phenotype", corpus = "taxon_annotations")
-term_freqs(phens$id, as = "phenotype", corpus = "taxa")
+term_freqs(phens$id, as = "phenotype", corpus = "genes")
 
 }

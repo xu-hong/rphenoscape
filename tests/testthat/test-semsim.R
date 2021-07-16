@@ -69,11 +69,11 @@ test_that("Resnik similarity", {
   subs.mat1 <- subs.mat[s,]
   rownames(subs.mat1) <- subs1
   sm.ic <- resnik_similarity(subs.mat1,
-                             wt_args = list(as = "phenotype", corpus = "taxon_annotations"))
+                             wt_args = list(as = "phenotype", corpus = "taxa"))
   testthat::expect_equal(dim(sm.ic), c(nrow(phens), nrow(phens)))
   testthat::expect_true(all(sm.ic > 0))
-  testthat::expect_true(all(sm.ic <= -log10(1 / corpus_size("taxon_annotations"))))
-  termICs <- -log10(term_freqs(phens$id, as = "phenotype", corpus = "taxon_annotations"))
+  testthat::expect_true(all(sm.ic <= -log10(1 / corpus_size("taxa"))))
+  termICs <- -log10(term_freqs(phens$id, as = "phenotype", corpus = "taxa"))
   testthat::expect_equivalent(diag(sm.ic), termICs)
 
   sm.ic <- resnik_similarity(subs.mat,
