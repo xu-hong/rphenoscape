@@ -26,7 +26,7 @@
 #' @param as the category or categories of the input terms (see [term_category()]).
 #'   Supported categories are "entity", "quality", and "phenotype". The value
 #'   must either be a single category (applying to all terms), or a vector of
-#'   categories (of same length as `x`). The default is "entity".
+#'   categories (of same length as `x`). The default is ""phenotype"".
 #' @param corpus the name of the corpus for which to determine frequencies.
 #'   Supported values are "taxon_annotations", "taxa", "gene_annotations", and
 #'   "genes". (At present, support for "gene_annotations" is pending support in
@@ -47,16 +47,15 @@
 #' @examples
 #' terms <- c("pectoral fin", "pelvic fin", "dorsal fin", "paired fin")
 #' IRIs <- sapply(terms, get_term_iri, as = "anatomy")
-#' term_freqs(IRIs, as = "entity")
+#' term_freqs(IRIs, as = "phenotype")
 #' 
 #' phens <- get_phenotypes(entity = "basihyal bone")
-#' term_freqs(phens$id, as = "phenotype", corpus = "taxon_annotations")
-#' term_freqs(phens$id, as = "phenotype", corpus = "taxa")
+#' term_freqs(phens$id, as = "phenotype", corpus = "genes")
 #' 
 #' @export
 term_freqs <- function(x,
-                       as = c("entity", "quality", "phenotype"),
-                       corpus = c("taxon_annotations", "taxa", "gene_annotations", "genes"),
+                       as = c("phenotype", "entity", "quality"),
+                       corpus = c("taxa", "taxon_annotations", "gene_annotations", "genes"),
                        decodeIRI = FALSE,
                        ...) {
   as <- match.arg(as, several.ok = TRUE)
@@ -76,32 +75,10 @@ term_freqs <- function(x,
                           header = FALSE, row.names = 1, check.names = FALSE)
     reordering <- match(x, rownames(freqs))
     freqs <- freqs[reordering,] / ctotal
-  } else if (corpus == "taxon_annotations") {
-    freqs <- mapply(annotations_count,
-                    iri = x, termType = as, ...)
-    freqs <- freqs / ctotal
   } else {
     stop("corpus '", corpus, "' is currently unsupported", call. = FALSE)
   }
   unname(freqs)
-}
-
-annotations_count <- function(iri, termType,
-                              apiEndpoint = "/taxon/annotations",
-                              ...) {
-  query <- pkb_args_to_query(...)
-  query$total <- TRUE
-  if (is.null(query[[termType]])) query[[termType]] <- iri
-  res <- get_json_data(pkb_api(apiEndpoint), query = query)
-  # if the IRI used for counting is a result of decoding the IRI, _and_ if
-  # we haven't included parts in the count already
-  if ((query[[termType]] != iri) && (is.null(query$parts) || ! query$parts)) {
-    # count with including parts, then subtract entities alone (counted before)
-    query$parts <- TRUE
-    res2 <- get_json_data(pkb_api(apiEndpoint), query = query)
-    res2$total - res$total
-  } else
-    res$total
 }
 
 #' Obtain the size of different corpora
